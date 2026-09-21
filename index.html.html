@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Retirement Projection — Personal Modeller</title>
+<style>
+:root{
+  --bg:#070b08;--panel:#111813;--panel2:#151e18;--line:#29352d;
+  --text:#f2f5f1;--muted:#98a59c;--green:#9bea8d;--green2:#6fc96c;
+  --yellow:#d8b36a;--red:#e8796b;--shadow:0 22px 70px rgba(0,0,0,.34)
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(900px 600px at 72% 0%,#17241b 0%,#0a0f0b 52%,#070b08 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:1450px;margin:auto;padding:28px 24px 70px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:25px;margin-bottom:24px}
+.brand small{color:var(--green);font-weight:800;letter-spacing:2px;font-size:10px}
+.brand h1{font-size:31px;line-height:1.04;margin:7px 0 9px;letter-spacing:-1px}
+.brand p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;max-width:700px}
+.badge{border:1px solid var(--line);background:#0e1510;border-radius:12px;padding:10px 13px;color:var(--muted);font-size:12px}
+.layout{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px}
+.card{background:linear-gradient(145deg,rgba(19,27,22,.97),rgba(12,18,14,.97));border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}
+.controls{padding:19px}
+.section-title{color:var(--green);font-size:10px;letter-spacing:1.5px;font-weight:850;margin:0 0 15px}
+.field{margin:0 0 14px}
+.field label{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:11px;margin-bottom:6px}
+.field label span{color:var(--text);font-weight:700}
+input[type=number]{width:100%;background:#0c120e;border:1px solid #2d3930;border-radius:9px;padding:10px 11px;color:var(--text);outline:none}
+input[type=number]:focus{border-color:#668c68}
+.range{width:100%;accent-color:var(--green)}
+.range-row{display:flex;align-items:center;gap:10px}
+.range-value{min-width:49px;text-align:right;color:var(--green);font-size:12px;font-weight:800}
+.toggle{display:grid;grid-template-columns:1fr 1fr;background:#0b110d;border:1px solid var(--line);border-radius:9px;padding:3px}
+.toggle button{border:0;background:transparent;color:var(--muted);padding:8px 5px;border-radius:7px;font-size:11px}
+.toggle button.active{background:#23352a;color:var(--green);font-weight:800}
+.help{font-size:10px;color:#77847a;line-height:1.4;margin-top:5px}
+.main{min-width:0}
+.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:13px}
+.hero{padding:20px}
+.hero-label{font-size:10px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase}
+.big{font-size:37px;line-height:1;margin:7px 0;color:var(--green);font-weight:850;letter-spacing:-1.5px}
+.hero-sub{font-size:11px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 9px;border-radius:99px;background:#102015;color:var(--green);font-size:10px;font-weight:750}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:13px}
+.kpi{padding:15px}
+.kpi .label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.kpi .value{font-size:22px;font-weight:800;margin-top:6px}
+.kpi .desc{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.35}
+.chart-card{margin-top:13px;padding:18px}
+.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.chart-title{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.legend{display:flex;gap:12px;font-size:10px;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+.chart-wrap{height:350px;position:relative}
+canvas{width:100%;height:100%;display:block}
+.scenario-card{margin-top:13px;padding:18px}
+.scenarios{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.scenario{border:1px solid var(--line);background:#0d140f;border-radius:12px;padding:13px}
+.scenario .rate{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.scenario .amount{font-size:21px;font-weight:800;margin:7px 0}
+.scenario .status{font-size:10px;font-weight:750}
+.status.good{color:var(--green)}.status.bad{color:var(--red)}
+.info{margin-top:13px;padding:16px}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.info h3{font-size:11px;margin:0 0 6px}.info p{font-size:10px;color:var(--muted);line-height:1.5;margin:0}
+.footer{margin-top:15px;color:#6f7b72;font-size:10px;line-height:1.5}
+.actionbar{display:flex;gap:8px;margin-top:14px}
+.actionbar button{border:1px solid var(--line);background:#0c130e;color:var(--muted);border-radius:8px;padding:8px 10px;font-size:10px}
+.actionbar button.primary{background:var(--green);border-color:var(--green);color:#102014;font-weight:800}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.controls{max-width:none}.hero-grid{grid-template-columns:1fr}.chart-wrap{height:310px}}
+@media(max-width:650px){.app{padding:20px 12px 45px}.top{display:block}.badge{display:inline-block;margin-top:15px}.kpis,.scenarios,.info-grid{grid-template-columns:1fr}.big{font-size:31px}.chart-wrap{height:280px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand">
+      <small>RETIREMENT PROJECTION</small>
+      <h1>What you need, and what to save each month.</h1>
+      <p>Enter the income you want in retirement today. We inflate it to your retirement year, calculate the required pot, then show what your saving could produce across different investment-return scenarios.</p>
+    </div>
+    <div class="badge">Personal model · £ sterling</div>
+  </div>
+
+  <div class="layout">
+    <aside class="card controls">
+      <div class="section-title">YOUR PLAN</div>
+
+      <div class="field">
+        <label>Desired annual income, in today's money</label>
+        <input id="income" type="number" min="0" step="500" value="40000">
+      </div>
+
+      <div class="field">
+        <label>Current age</label>
+        <input id="age" type="number" min="18" max="90" step="1" value="28">
+      </div>
+
+      <div class="field">
+        <label>Retirement age <span id="retageLabel">57</span></label>
+        <input id="retage" class="range" type="range" min="31" max="80" step="1" value="57">
+      </div>
+
+      <div class="field">
+        <label>Starting fund (what you have now)</label>
+        <input id="fund" type="number" min="0" step="100" value="38643.96">
+      </div>
+
+      <div class="field">
+        <label>Investment growth · before retirement</label>
+        <div class="range-row">
+          <input id="growth" class="range" type="range" min="0" max="10" step=".1" value="5">
+          <div class="range-value" id="growthVal">5.0%</div>
+        </div>
+        <div class="help">Nominal annual return assumption, compounded monthly.</div>
+      </div>
+
+      <div class="field">
+        <label>Assumed withdrawal rate · in retirement</label>
+        <div class="range-row">
+          <input id="withdraw" class="range" type="range" min="2" max="6" step=".1" value="4">
+          <div class="range-value" id="withdrawVal">4.0%</div>
+        </div>
+        <div class="help">A 4% withdrawal rate means the first-year withdrawal is 4% of the retirement pot.</div>
+      </div>
+
+      <div class="field">
+        <label>Monthly contributions</label>
+        <div class="toggle">
+          <button id="levelBtn" class="active" onclick="setContributionMode(false)">Level</button>
+          <button id="inflBtn" onclick="setContributionMode(true)">Rise with inflation</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Inflation assumption <span id="inflVal">2.5%</span></label>
+        <input id="infl" class="range" type="range" min="0" max="6" step=".1" value="2.5">
+        <div class="help">Used to translate today's desired income into the nominal income required at retirement.</div>
+      </div>
+
+      <div class="field">
+        <label>Monthly contribution</label>
+        <input id="monthly" type="number" min="0" step="10" value="685.42">
+      </div>
+
+      <div class="actionbar">
+        <button class="primary" onclick="resetModel()">Reset</button>
+        <button onclick="window.print()">Print / PDF</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="hero-grid">
+        <div class="card hero">
+          <div class="hero-label">Target pot at age <span id="heroAge">57</span></div>
+          <div class="big" id="targetPot">£0</div>
+          <div class="hero-sub">4% withdrawal · future-money figure</div>
+          <div class="pill">Required retirement income: <span id="futureIncome">£0</span>/yr</div>
+        </div>
+        <div class="card hero">
+          <div class="hero-label">Save each month</div>
+          <div class="big" id="requiredMonthly">£0</div>
+          <div class="hero-sub">to reach the target under your selected assumptions</div>
+          <div class="pill" id="monthlyDelta">Current: £0/mo</div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="card kpi">
+          <div class="label">Projected pot at retirement</div>
+          <div class="value" id="projectedPot">£0</div>
+          <div class="desc" id="projectedReal">£0 in today's money</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Projected income</div>
+          <div class="value" id="projectedIncome">£0</div>
+          <div class="desc">first-year income at selected withdrawal rate</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Surplus / shortfall</div>
+          <div class="value" id="surplus">£0</div>
+          <div class="desc" id="surplusDesc">against target pot</div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div class="chart-title">Where your saving could land you</div>
+          <div class="legend">
+            <span><i class="dot" style="background:#9bea8d"></i>Projected</span>
+            <span><i class="dot" style="background:#d8b36a"></i>Target</span>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      </div>
+
+      <div class="card scenario-card">
+        <div class="chart-title" style="margin-bottom:12px">Outcomes across return worlds</div>
+        <div class="scenarios" id="scenarioGrid"></div>
+      </div>
+
+      <div class="card info">
+        <div class="info-grid">
+          <div><h3>Future income</h3><p>Your £40,000 target is inflated by your selected inflation assumption until retirement.</p></div>
+          <div><h3>Target pot</h3><p>The target is future retirement income divided by your selected withdrawal rate.</p></div>
+          <div><h3>Projection</h3><p>The projection compounds the current fund and monthly contributions using the selected return assumption.</p></div>
+        </div>
+      </div>
+
+      <div class="footer">Illustrative planning model. Investment returns, inflation and future spending are uncertain. The model does not account for tax, charges, State Pension, sequence-of-returns risk or changing retirement spending unless you add those assumptions separately.</div>
+    </main>
+  </div>
+</div>
+
+<script>
+let inflationLinked=false;
+
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(Math.round(n));
+const money2=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:2}).format(n);
+
+function setContributionMode(linked){
+  inflationLinked=linked;
+  $('levelBtn').classList.toggle('active',!linked);
+  $('inflBtn').classList.toggle('active',linked);
+  calculate();
+}
+
+function monthlyFutureValue(p,r,n,contribution,linked,inf){
+  if(n<=0)return p;
+  if(linked){
+    // Monthly contribution rises annually with inflation.
+    let balance=p;
+    const monthlyRate=r;
+    for(let m=1;m<=n;m++){
+      const year=Math.floor((m-1)/12);
+      const c=contribution*Math.pow(1+inf,year);
+      balance=balance*(1+monthlyRate)+c;
+    }
+    return balance;
+  }
+  return p*Math.pow(1+r,n)+(r?contribution*(Math.pow(1+r,n)-1)/r:contribution*n);
+}
+
+function monthlyRequired(target,p,r,n,linked,inf){
+  if(n<=0)return 0;
+  if(!linked){
+    const growth=p*Math.pow(1+r,n);
+    const factor=r?((Math.pow(1+r,n)-1)/r):n;
+    return Math.max(0,(target-growth)/factor);
+  }
+  // Solve by binary search for the starting monthly contribution that grows annually with inflation.
+  let lo=0,hi=target;
+  for(let k=0;k<80;k++){
+    const mid=(lo+hi)/2;
+    const v=monthlyFutureValue(p,r,n,mid,true,inf);
+    if(v<target)lo=mid;else hi=mid;
+  }
+  return hi;
+}
+
+function modelFor(growth){
+  const income=+$('income').value||0;
+  const age=+$('age').value||0;
+  const retAge=+$('retage').value||age;
+  const fund=+$('fund').value||0;
+  const monthly=+$('monthly').value||0;
+  const inf=(+$('infl').value||0)/100;
+  const withdrawal=(+$('withdraw').value||0)/100;
+  const years=Math.max(0,retAge-age);
+  const months=years*12;
+  const mr=Math.pow(1+growth,1/12)-1;
+  const futureIncome=income*Math.pow(1+inf,years);
+  const target=futureIncome/withdrawal;
+  const projected=monthlyFutureValue(fund,mr,months,monthly,inflationLinked,inf);
+  const required=monthlyRequired(target,fund,mr,months,inflationLinked,inf);
+  return {income,age,retAge,fund,monthly,inf,withdrawal,years,months,mr,futureIncome,target,projected,required};
+}
+
+function calculate(){
+  const g=(+$('growth').value||0)/100;
+  const m=modelFor(g);
+  $('retageLabel').textContent=m.retAge;
+  $('heroAge').textContent=m.retAge;
+  $('growthVal').textContent=(g*100).toFixed(1)+'%';
+  $('withdrawVal').textContent=(m.withdrawal*100).toFixed(1)+'%';
+  $('inflVal').textContent=(m.inf*100).toFixed(1)+'%';
+
+  $('targetPot').textContent=money(m.target);
+  $('futureIncome').textContent=money(m.futureIncome);
+  $('requiredMonthly').textContent=money2(m.required);
+  $('monthlyDelta').textContent='Current: '+money2(m.monthly)+'/mo · '+(m.required>m.monthly?'Need +':'Could save ')+money2(Math.abs(m.required-m.monthly))+'/mo';
+
+  $('projectedPot').textContent=money(m.projected);
+  $('projectedReal').textContent=money(m.projected/Math.pow(1+m.inf,m.years))+' in today\'s money';
+  $('projectedIncome').textContent=money(m.projected*m.withdrawal);
+  const diff=m.projected-m.target;
+  $('surplus').textContent=(diff<0?'-':'')+money(Math.abs(diff));
+  $('surplus').style.color=diff>=0?'var(--green)':'var(--red)';
+  $('surplusDesc').textContent=diff>=0?'above target pot':'below target pot';
+
+  drawChart(m,g);
+  renderScenarios(m);
+}
+
+function drawChart(m,g){
+  const canvas=$('chart'),ctx=canvas.getContext('2d');
+  const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const W=rect.width,H=rect.height,p={l:64,r:18,t:22,b:34};
+  const n=m.years;
+  const projected=[],target=[];
+  for(let y=0;y<=n;y++){
+    const months=y*12;
+    const mr=Math.pow(1+g,1/12)-1;
+    projected.push(monthlyFutureValue(m.fund,mr,months,m.monthly,inflationLinked,m.inf));
+    target.push(m.income*Math.pow(1+m.inf,y)/m.withdrawal);
+  }
+  const max=Math.max(1,...projected,...target)*1.08;
+  ctx.clearRect(0,0,W,H);
+
+  // grid
+  ctx.font='10px Inter,system-ui,sans-serif';
+  for(let i=0;i<5;i++){
+    const y=p.t+(H-p.t-p.b)*i/4;
+    ctx.strokeStyle='#263229';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(W-p.r,y);ctx.stroke();
+    ctx.fillStyle='#78857c';ctx.fillText(money(max*(1-i/4)),5,y+4);
+  }
+
+  function plot(arr,stroke,width){
+    ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.beginPath();
+    arr.forEach((v,i)=>{
+      const x=p.l+(W-p.l-p.r)*(i/n);
+      const y=p.t+(H-p.t-p.b)*(1-v/max);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  }
+  plot(target,'#d8b36a',1.8);plot(projected,'#9bea8d',2.7);
+
+  ctx.fillStyle='#78857c';ctx.font='10px Inter,system-ui,sans-serif';
+  ctx.fillText(String(m.age),p.l,H-10);
+  ctx.fillText(String(m.retAge),W-p.r-22,H-10);
+
+  // target marker
+  const endY=p.t+(H-p.t-p.b)*(1-target[n]/max);
+  ctx.setLineDash([4,5]);ctx.strokeStyle='#5d675f';ctx.beginPath();ctx.moveTo(p.l,endY);ctx.lineTo(W-p.r,endY);ctx.stroke();ctx.setLineDash([]);
+}
+
+function renderScenarios(m){
+  const grid=$('scenarioGrid');grid.innerHTML='';
+  [0.03,0.05,0.08].forEach(r=>{
+    const rr=Math.pow(1+r,1/12)-1;
+    const p=monthlyFutureValue(m.fund,rr,m.months,m.monthly,inflationLinked,m.inf);
+    const d=p-m.target;
+    const el=document.createElement('div');el.className='scenario';
+    el.innerHTML='<div class="rate">'+(r*100).toFixed(0)+'% growth</div>'+
+      '<div class="amount">'+money(p)+'</div>'+
+      '<div class="status '+(d>=0?'good':'bad')+'">'+(d>=0?'HIT TARGET':'SHORTFALL')+' · '+money(Math.abs(d))+'</div>';
+    grid.appendChild(el);
+  });
+}
+
+function resetModel(){
+  $('income').value=40000;$('age').value=28;$('retage').value=57;$('fund').value=38643.96;
+  $('monthly').value=685.42;$('growth').value=5;$('infl').value=2.5;$('withdraw').value=4;
+  inflationLinked=false;setContributionMode(false);calculate();
+}
+
+['income','age','retage','fund','monthly','growth','infl','withdraw'].forEach(id=>$(id).addEventListener('input',calculate));
+window.addEventListener('resize',calculate);
+calculate();
+</script>
+</body>
+</html>
