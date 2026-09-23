@@ -150,6 +150,7 @@ canvas{width:100%;height:100%;display:block}
         <button class="primary" onclick="resetModel()">Reset</button>
         <button onclick="window.print()">Print / PDF</button>
       </div>
+      <div style="margin-top:9px;color:#6f7b72;font-size:9px">Your inputs are automatically saved on this device in your browser.</div>
     </aside>
 
     <main class="main">
@@ -217,6 +218,38 @@ canvas{width:100%;height:100%;display:block}
 
 <script>
 let inflationLinked=false;
+const STORAGE_KEY = 'personalRetirementModeller_v1';
+
+function saveInputs(){
+  const data = {
+    income: $('income').value,
+    age: $('age').value,
+    retage: $('retage').value,
+    fund: $('fund').value,
+    monthly: $('monthly').value,
+    growth: $('growth').value,
+    infl: $('infl').value,
+    withdraw: $('withdraw').value,
+    inflationLinked: inflationLinked
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function loadInputs(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    ['income','age','retage','fund','monthly','growth','infl','withdraw'].forEach(function(id){
+      if(data[id] !== undefined) $(id).value = data[id];
+    });
+    if(typeof data.inflationLinked === 'boolean') inflationLinked = data.inflationLinked;
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
 
 const $=id=>document.getElementById(id);
 const money=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(Math.round(n));
@@ -281,6 +314,7 @@ function modelFor(growth){
 }
 
 function calculate(){
+  saveInputs();
   const g=(+$('growth').value||0)/100;
   const m=modelFor(g);
   $('retageLabel').textContent=m.retAge;
@@ -366,6 +400,7 @@ function renderScenarios(m){
 }
 
 function resetModel(){
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
   $('income').value=40000;$('age').value=28;$('retage').value=57;$('fund').value=38643.96;
   $('monthly').value=685.42;$('growth').value=5;$('infl').value=2.5;$('withdraw').value=4;
   inflationLinked=false;setContributionMode(false);calculate();
@@ -373,6 +408,10 @@ function resetModel(){
 
 ['income','age','retage','fund','monthly','growth','infl','withdraw'].forEach(id=>$(id).addEventListener('input',calculate));
 window.addEventListener('resize',calculate);
+
+// Restore the last values saved on this device/browser.
+loadInputs();
+setContributionMode(inflationLinked);
 calculate();
 </script>
 </body>
