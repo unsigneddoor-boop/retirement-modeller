@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retirement Modeller</title>
+<style>
+:root{--bg:#071b16;--panel:#0d2921;--panel2:#103329;--line:#23483b;--text:#edf7f0;--muted:#a0b9ad;--green:#8fe0a6;--lime:#c7f36b;--gold:#f2c879;--blue:#7dd3c7;--red:#ff9e91;--shadow:0 12px 32px #0003}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#153c2e 0,transparent 40%),var(--bg);color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:1440px;margin:auto;padding:28px 24px 40px}.top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px}.eyebrow{color:var(--green);text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:800}.top h1{font-size:clamp(28px,4vw,42px);letter-spacing:-.04em;margin:5px 0 6px}.sub{color:var(--muted);max-width:720px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#12372b;color:var(--text);border-radius:10px;padding:10px 13px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--green)}.btn.primary{background:var(--green);color:#082117;border-color:var(--green)}
+.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}.panel{background:linear-gradient(145deg,#0e2a22,#0a211b);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}.panelhead{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panelhead h2{font-size:15px;margin:0;letter-spacing:-.01em}.panelhead small{color:var(--muted)}.controls{padding:18px 20px}.field{margin-bottom:19px}.field:last-child{margin-bottom:0}.fieldtop{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:7px}.field label{font-weight:650;color:#d9e9df}.value{color:var(--green);font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}.field input[type=number],.field input[type=text]{width:100%;background:#061a14;color:var(--text);border:1px solid #2b5143;border-radius:9px;padding:10px 11px;font:inherit;outline:none}.field input:focus{border-color:var(--green)}.field input[type=range]{width:100%;accent-color:var(--green);cursor:pointer}.rangeends{display:flex;justify-content:space-between;color:#7f9b8d;font-size:11px;margin-top:1px}.unit{font-size:11px;color:var(--muted);margin-top:4px}.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #1b4033}.toggle:first-child{border-top:0}.toggle strong{display:block;font-size:13px}.toggle span{display:block;color:var(--muted);font-size:11px;margin-top:2px}.switch{appearance:none;width:42px;height:24px;flex:none;border-radius:20px;background:#29463a;position:relative;cursor:pointer;transition:.2s}.switch:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#b3c7bb;transition:.2s}.switch:checked{background:#3b9b65}.switch:checked:before{left:21px;background:white}.content{display:grid;gap:18px}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{padding:17px 18px;background:linear-gradient(145deg,#12372b,#0b251d);border:1px solid var(--line);border-radius:15px;min-width:0}.kpi .label{color:var(--muted);font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.07em}.kpi .num{font-size:clamp(20px,2.2vw,29px);font-weight:850;letter-spacing:-.045em;margin:8px 0 3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.kpi .note{font-size:11px;color:var(--muted)}.kpi.good .num{color:var(--green)}.kpi.warn .num{color:var(--gold)}.chartpanel{padding-bottom:10px}.chartintro{padding:13px 20px 0;color:var(--muted);font-size:12px}.chartbox{height:300px;padding:8px 14px 10px;position:relative}.chartbox.tall{height:365px}.chartbox canvas{width:100%;height:100%;display:block}.legend{display:flex;gap:17px;flex-wrap:wrap;padding:0 20px 12px;color:var(--muted);font-size:11px}.key{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px}.footnote{color:var(--muted);font-size:11px;padding:0 20px 18px}.badge{border:1px solid #2a5543;border-radius:99px;padding:5px 9px;color:var(--green);font-size:11px;font-weight:750;white-space:nowrap}.summary{padding:18px 20px;color:#c4d9cc;font-size:12px;border-top:1px solid var(--line)}.summary strong{color:var(--text)}.tooltip{position:absolute;display:none;pointer-events:none;z-index:5;background:#04130f;border:1px solid #37634f;border-radius:9px;padding:9px 11px;box-shadow:0 8px 24px #0007;font-size:11px;min-width:140px;color:#eaf6ed}.tooltip b{display:block;color:var(--green);font-size:12px;margin-bottom:4px}.tooltip div{display:flex;justify-content:space-between;gap:12px;color:#b7cec0}.empty{padding:35px;text-align:center;color:var(--muted)}
+@media(max-width:1050px){.layout{grid-template-columns:300px minmax(0,1fr)}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.wrap{padding:18px 12px 28px}.top{display:block}.actions{margin-top:15px}.layout{grid-template-columns:1fr}.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}.controls .toggles{grid-column:1/-1}.chartbox{height:260px}.chartbox.tall{height:310px}.kpis{gap:8px}.kpi{padding:13px}.panelhead{padding:15px}.chartintro{padding-left:15px;padding-right:15px}}
+@media(max-width:420px){.controls{grid-template-columns:1fr}.kpi .num{font-size:20px}.chartbox{padding-left:4px;padding-right:4px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div><div class="eyebrow">Personal finance planner</div><h1>Retirement modeller<span style="color:var(--green)">.</span></h1><div class="sub">Explore how your pension could grow, what income it may support, and the contribution needed to reach your retirement target.</div></div>
+    <div class="actions"><button class="btn" id="resetBtn">Reset assumptions</button><button class="btn primary" id="printBtn">Print / save PDF</button></div>
+  </header>
+  <div class="layout">
+    <aside class="panel">
+      <div class="panelhead"><h2>Your assumptions</h2><span class="badge">Live model</span></div>
+      <div class="controls">
+        <div class="field"><div class="fieldtop"><label for="currentAge">Current age</label><span class="value" id="currentAgeVal"></span></div><input id="currentAge" type="range" min="18" max="75" step="1" value="28"><div class="rangeends"><span>18</span><span>75</span></div></div>
+        <div class="field"><div class="fieldtop"><label for="retirementAge">Retirement age</label><span class="value" id="retirementAgeVal"></span></div><input id="retirementAge" type="range" min="40" max="85" step="1" value="65"><div class="rangeends"><span>40</span><span>85</span></div></div>
+        <div class="field"><div class="fieldtop"><label for="endAge">Planned end age</label><span class="value" id="endAgeVal"></span></div><input id="endAge" type="range" min="70" max="110" step="1" value="90"><div class="rangeends"><span>70</span><span>110</span></div></div>
+        <div class="field"><div class="fieldtop"><label for="income">Desired annual income</label><span class="value" id="incomeVal"></span></div><input id="income" type="number" min="0" max="500000" step="500" value="35000"><div class="unit">In today's money, before tax</div></div>
+        <div class="field"><div class="fieldtop"><label for="pot">Current pension pot</label><span class="value" id="potVal"></span></div><input id="pot" type="number" min="0" max="10000000" step="500" value="38644"></div>
+        <div class="field"><div class="fieldtop"><label for="contribution">Monthly contribution</label><span class="value" id="contributionVal"></span></div><input id="contribution" type="number" min="0" max="50000" step="25" value="1000"><div class="unit">Combined personal and employer contributions</div></div>
+        <div class="field"><div class="fieldtop"><label for="growth">Growth before retirement</label><span class="value" id="growthVal"></span></div><input id="growth" type="range" min="-2" max="12" step=".25" value="5"><div class="rangeends"><span>-2%</span><span>12%</span></div></div>
+        <div class="field"><div class="fieldtop"><label for="postGrowth">Growth after retirement</label><span class="value" id="postGrowthVal"></span></div><input id="postGrowth" type="range" min="-2" max="10" step=".25" value="3.5"><div class="rangeends"><span>-2%</span><span>10%</span></div></div>
+        <div class="field"><div class="fieldtop"><label for="inflation">Inflation assumption</label><span class="value" id="inflationVal"></span></div><input id="inflation" type="range" min="0" max="8" step=".25" value="2.5"><div class="rangeends"><span>0%</span><span>8%</span></div></div>
+        <div class="toggles">
+          <div class="toggle"><div><strong>Inflation-linked contributions</strong><span>Increase monthly contributions annually</span></div><input class="switch" id="contribInflation" type="checkbox" checked aria-label="Inflation-linked contributions"></div>
+          <div class="toggle"><div><strong>Inflation-linked withdrawals</strong><span>Raise private withdrawals each year in retirement</span></div><input class="switch" id="withdrawInflation" type="checkbox" checked aria-label="Inflation-linked withdrawals"></div>
+        </div>
+      </div>
+      <div class="summary" id="assumptionSummary"></div>
+      <div class="footnote" style="padding-top:0">Your figures are saved automatically in this browser on this device. They are not uploaded anywhere.</div>
+    </aside>
+    <main class="content">
+      <section class="kpis">
+        <div class="kpi"><div class="label">Target pot at retirement</div><div class="num" id="targetKpi">—</div><div class="note">Required at retirement age</div></div>
+        <div class="kpi"><div class="label">Projected pot</div><div class="num" id="projectedKpi">—</div><div class="note" id="projectedNote">At retirement age</div></div>
+        <div class="kpi good"><div class="label">Monthly contribution needed</div><div class="num" id="neededKpi">—</div><div class="note">To reach the target pot</div></div>
+        <div class="kpi warn"><div class="label">Surplus / shortfall</div><div class="num" id="gapKpi">—</div><div class="note" id="gapNote">Projected minus target</div></div>
+      </section>
+      <section class="panel chartpanel">
+        <div class="panelhead"><div><h2>Building your retirement pot</h2><small>Projected pension value versus required target</small></div><span class="badge" id="yearsBadge">— years to go</span></div>
+        <div class="chartintro">Assumes monthly contributions at month-end and annual effective investment growth converted to a monthly rate.</div>
+        <div class="chartbox"><canvas id="growthChart" aria-label="Projected pension growth chart"></canvas><div class="tooltip" id="growthTip"></div></div>
+        <div class="legend"><span><i class="key" style="background:#8fe0a6"></i>Projected pension</span><span><i class="key" style="background:#f2c879"></i>Target pot</span></div>
+      </section>
+      <section class="panel chartpanel">
+        <div class="panelhead"><div><h2>Retirement income & remaining pot</h2><small>Annual income mix and pension balance by age</small></div><span class="badge">State Pension from 67</span></div>
+        <div class="chartintro">Income bars are nominal pounds for each year. The line uses the right-hand axis for the estimated private pension balance after withdrawals.</div>
+        <div class="chartbox tall"><canvas id="retirementChart" aria-label="Retirement income and remaining pension pot chart"></canvas><div class="tooltip" id="retirementTip"></div></div>
+        <div class="legend"><span><i class="key" style="background:#8fe0a6"></i>Private pension income</span><span><i class="key" style="background:#7dd3c7"></i>State Pension</span><span><i class="key" style="background:#f2c879"></i>Remaining pension pot (right axis)</span></div>
+        <div class="footnote" id="retirementFootnote"></div>
+      </section>
+      <section class="panel"><div class="panelhead"><h2>How the model works</h2></div><div class="summary" style="border-top:0">
+        <p><strong>Target pot:</strong> the amount needed at retirement to cover the desired income after subtracting State Pension income, discounted using your assumed post-retirement growth rate. State Pension is modelled as £12,548 a year in today's money, available from age 67, and increasing by 2.5% each year.</p>
+        <p><strong>Contribution estimate:</strong> solves for a level starting monthly contribution that grows with your selected assumption and builds the target pot by retirement. If inflation-linked contributions are enabled, contributions increase once per year by the inflation assumption.</p>
+        <p><strong>Important:</strong> this is an illustrative projection, not financial advice. It excludes tax, fees, annuity pricing, contribution limits, and changes to State Pension policy. Returns are smooth assumptions; real investment returns vary. State Pension is shown gross and the income goal is treated as a gross amount.</p>
+      </div></section>
+    </main>
+  </div>
+</div>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const ids = ['currentAge','retirementAge','endAge','income','pot','contribution','growth','postGrowth','inflation','contribInflation','withdrawInflation'];
+const defaults = {currentAge:28,retirementAge:65,endAge:90,income:35000,pot:38644,contribution:1000,growth:5,postGrowth:3.5,inflation:2.5,contribInflation:true,withdrawInflation:true};
+const STORAGE_KEY = 'retirementModellerAssumptions_v1';
+
+// Restore saved assumptions before the first calculation. This keeps figures between
+// visits/reloads in the same browser on this device.
+try {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+  if (saved && typeof saved === 'object') {
+    ids.forEach(id => {
+      if (!(id in saved)) return;
+      const el = document.getElementById(id);
+      if (el.type === 'checkbox') el.checked = Boolean(saved[id]);
+      else if (saved[id] !== null && saved[id] !== '' && Number.isFinite(Number(saved[id]))) el.value = saved[id];
+    });
+  }
+} catch (e) {
+  // If browser storage is unavailable, the modeller still works for this session.
+}
+const fmt = n => new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(Number.isFinite(n)?n:0);
+const fmt2 = n => new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
+const pct = n => `${Number(n).toFixed(2).replace(/\.00$/,'')}%`;
+const num = id => Math.max(0, Number($(id).value)||0);
+function read(){return {currentAge:+$('currentAge').value,retirementAge:+$('retirementAge').value,endAge:+$('endAge').value,income:num('income'),pot:num('pot'),contribution:num('contribution'),growth:+$('growth').value/100,postGrowth:+$('postGrowth').value/100,inflation:+$('inflation').value/100,contribInflation:$('contribInflation').checked,withdrawInflation:$('withdrawInflation').checked};}
+function syncConstraints(changed){
+ let c=$('currentAge'),r=$('retirementAge'),e=$('endAge');
+ r.min=+c.value+1; if(+r.value<=+c.value)r.value=Math.min(85,+c.value+1);
+ e.min=+r.value+1; if(+e.value<=+r.value)e.value=Math.min(110,+r.value+1);
+ if(changed==='currentAge' && +r.value<=+c.value)r.value=+c.value+1;
+ if(changed==='retirementAge' && +e.value<=+r.value)e.value=+r.value+1;
+}
+function pensionAtRetirement(p, monthly, contributionInflation=true){
+ const months=Math.max(0,(p.retirementAge-p.currentAge)*12);
+ let bal=p.pot, rate=Math.pow(1+p.growth,1/12)-1;
+ for(let m=1;m<=months;m++){
+   if(p.contribInflation && m>1 && (m-1)%12===0) monthly *= 1+p.inflation;
+   bal=bal*(1+rate)+monthly;
+ }
+ return bal;
+}
+function statePension(age,p){
+ if(age<67)return 0;
+ // £12,548 is expressed in today's money. Uprate at 2.5% per year from the current age.
+ return 12548*Math.pow(1.025,Math.max(0,age-p.currentAge));
+}
+function annualGoal(age,p){
+ const atRetirement=p.income*Math.pow(1+p.inflation,p.retirementAge-p.currentAge);
+ if(p.withdrawInflation)return atRetirement*Math.pow(1+p.inflation,age-p.retirementAge);
+ return atRetirement;
+}
+function targetAtRetirement(p){
+ let total=0, growth=p.postGrowth;
+ for(let age=p.retirementAge;age<p.endAge;age++){
+   const privateNeed=Math.max(0,annualGoal(age,p)-statePension(age,p));
+   // Withdraw at the start of each retirement year; remaining balance then grows.
+   total += privateNeed/Math.pow(1+growth,age-p.retirementAge);
+ }
+ // Last year income at endAge is not included: planned end age is the age at which the model ends.
+ return Math.max(0,total);
+}
+function monthlyNeeded(p,target){
+ const months=(p.retirementAge-p.currentAge)*12;
+ if(months<=0)return 0;
+ const fv0=pensionAtRetirement({...p,contribInflation:false},0);
+ if(target<=fv0)return 0;
+ let lo=0,hi=100000;
+ for(let i=0;i<70;i++){
+   let mid=(lo+hi)/2;
+   let v=pensionAtRetirement(p,mid);
+   if(v<target)lo=mid;else hi=mid;
+ }
+ return hi;
+}
+function buildGrowth(p,target){
+ const out=[];let bal=p.pot,monthly=p.contribution,rate=Math.pow(1+p.growth,1/12)-1;
+ out.push({age:p.currentAge,pot:bal,target:null});
+ let lastAge=p.currentAge;
+ for(let m=1;m<=(p.retirementAge-p.currentAge)*12;m++){
+  if(p.contribInflation&&m>1&&(m-1)%12===0)monthly*=1+p.inflation;
+  bal=bal*(1+rate)+monthly;
+  if(m%12===0){lastAge=p.currentAge+m/12;out.push({age:lastAge,pot:bal,target:lastAge===p.retirementAge?target:null});}
+ }
+ return out;
+}
+function buildRetirement(p){
+ let pot=pensionAtRetirement(p,p.contribution),arr=[];
+ const growth=p.postGrowth;
+ for(let age=p.retirementAge;age<p.endAge;age++){
+  const sp=statePension(age,p),goal=annualGoal(age,p),privateIncome=Math.max(0,goal-sp);
+  // Spend the annual withdrawal, then apply that year's investment return.
+  pot=Math.max(0,pot-privateIncome);
+  arr.push({age,privateIncome,statePension:sp,total:privateIncome+sp,pot});
+  pot=pot*(1+growth);
+ }
+ return arr;
+}
+function updateLabels(p){
+ const values={currentAge:p.currentAge,retirementAge:p.retirementAge,endAge:p.endAge,income:fmt(p.income),pot:fmt(p.pot),contribution:fmt2(p.contribution),growth:pct(p.growth*100),postGrowth:pct(p.postGrowth*100),inflation:pct(p.inflation*100)};
+ Object.entries(values).forEach(([k,v])=>$(k+'Val').textContent=v);
+}
+function model(){
+ syncConstraints();
+ const p=read();
+ // Save the live assumptions automatically so the next visit starts where this one ended.
+ try {
+   const saved = {};
+   ids.forEach(id => { saved[id] = $(id).type === 'checkbox' ? $(id).checked : $(id).value; });
+   localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+ } catch (e) {
+   // Storage can be disabled in some private/browser configurations; calculations still work.
+ }
+ updateLabels(p);
+ const target=targetAtRetirement(p), projected=pensionAtRetirement(p,p.contribution),needed=monthlyNeeded(p,target),gap=projected-target;
+ $('targetKpi').textContent=fmt(target);$('projectedKpi').textContent=fmt(projected);$('neededKpi').textContent=fmt2(needed);
+ $('gapKpi').textContent=(gap>=0?'+':'−')+fmt(Math.abs(gap));$('gapKpi').style.color=gap>=0?'var(--green)':'var(--red)';
+ $('projectedNote').textContent=`At age ${p.retirementAge}`;$('gapNote').textContent=gap>=0?'Above target pot':'Below target pot';
+ $('yearsBadge').textContent=`${p.retirementAge-p.currentAge} years to go`;
+ $('assumptionSummary').innerHTML=`<strong>Planning window:</strong> age ${p.currentAge} to ${p.retirementAge}, with funds modelled through age ${p.endAge}.<br><strong>Contribution setting:</strong> ${p.contribInflation?'contributions rise with inflation':'contributions remain level'}.<br><strong>Withdrawal setting:</strong> ${p.withdrawInflation?'private withdrawals rise with inflation':'private withdrawals remain level'}.`;
+ const ret=buildRetirement(p);
+ const exhausted=ret.find(d=>d.pot<=0);
+ $('retirementFootnote').textContent=exhausted?`Under these assumptions, the private pension is depleted by around age ${exhausted.age}. The income bars continue to show the modelled income requirement, but private pension assets cannot fund any shortfall after depletion.`:`The private pension remains above £0 through the modelled retirement period under these assumptions.`;
+ drawGrowth(buildGrowth(p,target),target,p.retirementAge);
+ drawRetirement(ret,p);
+}
+function canvasSetup(canvas){
+ const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+ canvas.width=Math.max(1,Math.floor(rect.width*dpr));canvas.height=Math.max(1,Math.floor(rect.height*dpr));
+ const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w:rect.width,h:rect.height};
+}
+function drawAxes(ctx,w,h,plot,yticks,ymax,format){
+ ctx.font='10px system-ui';ctx.textBaseline='middle';ctx.textAlign='right';
+ yticks.forEach(v=>{let y=plot.y+plot.h-(v/ymax)*plot.h;ctx.strokeStyle='#23483b';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(plot.x,y);ctx.lineTo(plot.x+plot.w,y);ctx.stroke();ctx.fillStyle='#91ac9d';ctx.fillText(format(v),plot.x-8,y);});
+}
+function drawGrowth(data,target,retAge){
+ const canvas=$('growthChart'),tip=$('growthTip'),{ctx,w,h}=canvasSetup(canvas);
+ const pad={l:72,r:18,t:18,b:34},plot={x:pad.l,y:pad.t,w:w-pad.l-pad.r,h:h-pad.t-pad.b};
+ ctx.clearRect(0,0,w,h);if(!data.length)return;
+ const maxVal=Math.max(target,...data.map(d=>d.pot),1)*1.12;
+ const ticks=Array.from({length:5},(_,i)=>maxVal*i/4);drawAxes(ctx,w,h,plot,ticks,maxVal,v=>v>=1000000?'£'+(v/1000000).toFixed(1)+'m':v>=1000?'£'+Math.round(v/1000)+'k':'£'+Math.round(v));
+ const x=i=>plot.x+(i/(data.length-1||1))*plot.w,y=v=>plot.y+plot.h-(v/maxVal)*plot.h;
+ // target reference
+ ctx.strokeStyle='#f2c879';ctx.setLineDash([6,5]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(plot.x,y(target));ctx.lineTo(plot.x+plot.w,y(target));ctx.stroke();ctx.setLineDash([]);
+ // fill area
+ ctx.beginPath();data.forEach((d,i)=>i?ctx.lineTo(x(i),y(d.pot)):ctx.moveTo(x(i),y(d.pot)));ctx.lineTo(x(data.length-1),plot.y+plot.h);ctx.lineTo(x(0),plot.y+plot.h);ctx.closePath();ctx.fillStyle='rgba(143,224,166,.10)';ctx.fill();
+ ctx.beginPath();data.forEach((d,i)=>i?ctx.lineTo(x(i),y(d.pot)):ctx.moveTo(x(i),y(d.pot)));ctx.strokeStyle='#8fe0a6';ctx.lineWidth=2.5;ctx.stroke();
+ [0,Math.floor((data.length-1)/2),data.length-1].forEach(i=>{ctx.fillStyle='#91ac9d';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('Age '+data[i].age,x(i),plot.y+plot.h+9);});
+ ctx.fillStyle='#f2c879';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('Target '+fmt(target),plot.x+5,Math.max(plot.y+12,y(target)-6));
+ canvas._chart={data,plot,x,y,tip,kind:'growth'};
+}
+function drawRetirement(data,p){
+ const canvas=$('retirementChart'),tip=$('retirementTip'),{ctx,w,h}=canvasSetup(canvas);
+ const pad={l:60,r:62,t:18,b:35},plot={x:pad.l,y:pad.t,w:w-pad.l-pad.r,h:h-pad.t-pad.b};
+ ctx.clearRect(0,0,w,h);if(!data.length)return;
+ const maxIncome=Math.max(1,...data.map(d=>d.privateIncome+d.statePension))*1.15;
+ const maxPot=Math.max(1,...data.map(d=>d.pot),pensionAtRetirement(p,p.contribution))*1.08;
+ const ticks=Array.from({length:5},(_,i)=>maxIncome*i/4);drawAxes(ctx,w,h,plot,ticks,maxIncome,v=>v>=1000?'£'+Math.round(v/1000)+'k':'£'+Math.round(v));
+ // right axis labels
+ ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle='#c4a15f';ctx.font='10px system-ui';
+ for(let i=0;i<=4;i++){const v=maxPot*i/4,yy=plot.y+plot.h-(v/maxPot)*plot.h;ctx.fillText(v>=1000000?'£'+(v/1000000).toFixed(1)+'m':v>=1000?'£'+Math.round(v/1000)+'k':'£'+Math.round(v),plot.x+plot.w+7,yy);}
+ const slot=plot.w/data.length,bw=Math.max(2,Math.min(22,slot*.58)),x=i=>plot.x+(i+.5)*slot,y=v=>plot.y+plot.h-(v/maxIncome)*plot.h;
+ data.forEach((d,i)=>{const xx=x(i)-bw/2,hPriv=(d.privateIncome/maxIncome)*plot.h,hSP=(d.statePension/maxIncome)*plot.h;ctx.fillStyle='#8fe0a6';ctx.fillRect(xx,plot.y+plot.h-hPriv,bw,hPriv);ctx.fillStyle='#7dd3c7';ctx.fillRect(xx,plot.y+plot.h-hPriv-hSP,bw,hSP);});
+ // pot line on secondary axis
+ const yp=v=>plot.y+plot.h-(v/maxPot)*plot.h;
+ ctx.beginPath();data.forEach((d,i)=>i?ctx.lineTo(x(i),yp(d.pot)):ctx.moveTo(x(i),yp(d.pot)));ctx.strokeStyle='#f2c879';ctx.lineWidth=2.5;ctx.stroke();
+ data.forEach((d,i)=>{ctx.beginPath();ctx.arc(x(i),yp(d.pot),2.6,0,Math.PI*2);ctx.fillStyle='#f2c879';ctx.fill();});
+ const indices=[0,Math.floor((data.length-1)/2),data.length-1];
+ indices.forEach(i=>{ctx.fillStyle='#91ac9d';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('Age '+data[i].age,x(i),plot.y+plot.h+9);});
+ ctx.fillStyle='#91ac9d';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('Annual income',plot.x,2);
+ ctx.save();ctx.translate(w-5,plot.y+plot.h/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.fillStyle='#c4a15f';ctx.fillText('Remaining pot',0,0);ctx.restore();
+ canvas._chart={data,plot,x,y,yp,tip,kind:'retirement',bw};
+}
+function moneyTooltip(el,html,x,y,w,h){
+ el.innerHTML=html;el.style.display='block';const left=Math.max(6,Math.min(w-el.offsetWidth-6,x+12));const top=Math.max(6,Math.min(h-el.offsetHeight-6,y-10));el.style.left=left+'px';el.style.top=top+'px';
+}
+function attachHover(id){
+ const canvas=$(id);
+ canvas.addEventListener('mousemove',e=>{
+  const c=canvas._chart;if(!c)return;const rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  if(mx<c.plot.x||mx>c.plot.x+c.plot.w||my<c.plot.y||my>c.plot.y+c.plot.h){c.tip.style.display='none';return;}
+  const i=Math.max(0,Math.min(c.data.length-1,Math.round((mx-c.plot.x)/c.plot.w*(c.data.length-1)))),d=c.data[i];
+  if(c.kind==='growth'){
+   const target=targetAtRetirement(read());
+   moneyTooltip(c.tip,`<b>Age ${d.age}</b><div><span>Projected pot</span><strong>${fmt(d.pot)}</strong></div>${d.age===read().retirementAge?`<div><span>Target pot</span><strong>${fmt(target)}</strong></div>`:''}`,mx,my,rect.width,rect.height);
+  }else{
+   moneyTooltip(c.tip,`<b>Age ${d.age}</b><div><span>Private income</span><strong>${fmt(d.privateIncome)}</strong></div><div><span>State Pension</span><strong>${fmt(d.statePension)}</strong></div><div><span>Total income</span><strong>${fmt(d.total)}</strong></div><div><span>Remaining pot</span><strong>${fmt(d.pot)}</strong></div>`,mx,my,rect.width,rect.height);
+  }
+ });
+ canvas.addEventListener('mouseleave',()=>{if(canvas._chart)canvas._chart.tip.style.display='none';});
+}
+ids.forEach(id=>{const el=$(id);el.addEventListener('input',()=>model());el.addEventListener('change',()=>model());});
+$('resetBtn').addEventListener('click',()=>{Object.entries(defaults).forEach(([k,v])=>{if(k==='contribInflation'||k==='withdrawInflation')$(k).checked=v;else $(k).value=v;});model();});
+$('printBtn').addEventListener('click',()=>window.print());
+attachHover('growthChart');attachHover('retirementChart');
+let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(model,100);});
+model();
+})();
+</script>
+</body>
+</html>
